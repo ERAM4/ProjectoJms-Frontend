@@ -22,6 +22,7 @@ export default function NavBar() {
               <Link className="nav-link" to="/registro">Crear Cuenta</Link>
               <Link className="nav-link" to="/login">Iniciar Sesion</Link>
               <Link className="nav-link" to="/catalogo">Catalogo</Link>
+              <Link className="nav-link" to="/stockAdmin">Stock</Link>
 
             </div>
           </div>

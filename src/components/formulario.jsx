@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const RegistroUsuario = () => {
-  
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
@@ -16,7 +15,6 @@ const RegistroUsuario = () => {
   const [mensaje, setMensaje] = useState(null);
   const [error, setError] = useState(null);
 
-  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -25,14 +23,12 @@ const RegistroUsuario = () => {
     });
   };
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
     setMensaje(null);
 
-  
     if (formData.password !== formData.repetirPassword) {
       setError('Las contraseñas no coinciden. Por favor, verifica.');
       setIsLoading(false);
@@ -40,38 +36,33 @@ const RegistroUsuario = () => {
     }
 
     try {
-      const { repetirPassword, ...datosParaBackend } = formData;
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      
+      
+     
+      const { repetirPassword, ...datosUsuario } = formData;
+      
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      const response = await fetch(`${apiUrl}/api/registro`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(datosParaBackend),
-      });
+      
+      localStorage.setItem('usuarioCasona', JSON.stringify(datosUsuario));
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Hubo un error al registrar el usuario');
-      }
-
-      setMensaje('¡Cuenta creada exitosamente!');
+      
+      setMensaje('¡Cuenta creada exitosamente! Ya puedes iniciar sesión.');
       
       
       setFormData({ 
         nombre: '', apellido: '', correo: '', telefono: '', password: '', repetirPassword: '' 
       });
 
+      
     } catch (err) {
-      setError(err.message);
+      setError('Hubo un error al guardar los datos localmente.');
     } finally {
       setIsLoading(false);
     }
   };
 
- 
   return (
     <div 
       style={{ 
@@ -80,8 +71,8 @@ const RegistroUsuario = () => {
         alignItems: 'center',
         padding: '50px 15px', 
         backgroundImage: `
-          linear-gradient(to right, rgba(49, 212, 109, 0.7), rgba(62, 114, 33, 0.81)),
-          url('https://tse3.mm.bing.net/th/id/OIP.u9swOMIxfAsZODKna9JU4gHaEK?rs=1&pid=ImgDetMain&o=7&rm=3')
+          linear-gradient(to right, rgba(182, 94, 35, 0.7), rgba(105, 36, 36, 0.81)),
+          url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1920&q=80')
         `,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -95,7 +86,6 @@ const RegistroUsuario = () => {
               <div className="card-body p-5">
                 <h2 className="text-uppercase text-center mb-5">Crear una cuenta</h2>
 
-                {/* Mensajes de feedback */}
                 {mensaje && <div className="alert alert-success">{mensaje}</div>}
                 {error && <div className="alert alert-danger">{error}</div>}
 

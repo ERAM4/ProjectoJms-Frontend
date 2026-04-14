@@ -7,9 +7,9 @@ import Inicio from './pages/inicio.jsx'
 import Registro from './pages/registro.jsx'
 import Login from './pages/login.jsx'
 import Catalogo from './pages/catalogo.jsx'
+import StockAdmin from './pages/stockAdmin.jsx'
 
 import NavBar from "./components/NavBar.jsx"
-
 import Footer from "./components/Footer.jsx"
 
 import './App.css'
@@ -42,6 +42,7 @@ function App() {
           <Route path="/registro" element={<Registro />} />
           <Route path="/login" element={<Login />} />
           <Route path="/catalogo" element={<Catalogo />} />
+          <Route path="/stockAdmin" element={<StockAdmin />} />
 
         </Routes>
       </div>

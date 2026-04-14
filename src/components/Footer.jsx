@@ -13,25 +13,25 @@ const Footer = () => {
   return (
     <footer className="pt-1 pb-4 mt-auto footerStyle">
       
-      {/* BOTÓN FLOTANTE SOBREPUESTO */}
+      
       <button 
         className="btn rounded-circle shadow-lg" 
         onClick={scrollToTop}
         title="Volver al inicio"
         style={{ 
           
-          position: 'fixed',   // Lo "despega" del footer y lo hace flotar en pantalla
-          bottom: '30px',      // Separación desde abajo
-          right: '30px',       // Separación desde la derecha
+          position: 'fixed',   
+          bottom: '30px',      
+          right: '30px',       
           width: '50px', 
           height: '50px', 
           fontSize: '1.5rem', 
-          zIndex: 1000,        // Asegura que flote por encima de imágenes y textos
-          display: 'flex',     // Centra la flecha perfectamente
+          zIndex: 1000,        
+          display: 'flex',     
           alignItems: 'center',
           justifyContent: 'center',
-          color: 'white',       // Flecha blanca para que contraste con el fondo celeste
-          background:'#556B2F'
+          color: 'white',      
+          background:'#772014'
         }}
       >
         ⇧
@@ -41,7 +41,7 @@ const Footer = () => {
         <div className="row text-center text-md-start">
           
           <div className="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
-            <h5 className="text-uppercase mb-4 font-weight-bold" style={{ color: '#556B2F' }}>
+            <h5 className="text-uppercase mb-4 font-weight-bold" style={{ color: '#722F37' }}>
               Espacio Casona JMS
             </h5>
             <p>
@@ -51,7 +51,7 @@ const Footer = () => {
           </div>
 
           <div className="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
-            <h5 className="text-uppercase mb-4 font-weight-bold" style={{ color: '#556B2F' }}>
+            <h5 className="text-uppercase mb-4 font-weight-bold" style={{ color: '#722F37' }}>
               Enlaces
             </h5>
             <p>
@@ -66,7 +66,7 @@ const Footer = () => {
           </div>
 
           <div className="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
-            <h5 className="text-uppercase mb-4 font-weight-bold" style={{ color: '#556B2F' }}>
+            <h5 className="text-uppercase mb-4 font-weight-bold" style={{ color: '#722F37' }}>
               Contacto
             </h5>
             <p>
@@ -88,7 +88,7 @@ const Footer = () => {
             <p className="mb-0">
               © {new Date().getFullYear()} Copyright: 
               <a href="#" className="text-decoration-none ms-1" style={{ color: '#556B2F' }}>
-                <strong style={{ color: '#556B2F' }}>Espacio Casona JMS</strong>
+                <strong style={{ color: '#722F37' }}>Espacio Casona JMS</strong>
               </a>
             </p>
           </div>
