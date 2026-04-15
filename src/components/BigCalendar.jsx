@@ -180,9 +180,7 @@ export default function BigCalendar() {
               onSelectEvent={handleSelectEvent} 
               eventPropGetter={eventStyleGetter} 
               
-              // ==========================================
-              // APLICAMOS LOS LÍMITES DE HORARIO AL CALENDARIO
-              // ==========================================
+              
               min={minTime} 
               max={maxTime} 
               
