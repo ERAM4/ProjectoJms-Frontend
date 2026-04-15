@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 
 const GestionInventario = () => {
-  // ==========================================
-  // 1. ESTADOS DE DATOS Y FORMULARIOS
-  // ==========================================
+  
   const [productos, setProductos] = useState([
     { id: 1, nombre: "Silla Tiffany Blanca", categoria: "Mobiliario", cantidad: 150, precio: 2500 },
     { id: 2, nombre: "Mesa Redonda 1.8m", categoria: "Mobiliario", cantidad: 15, precio: 12000 },
@@ -17,26 +15,21 @@ const GestionInventario = () => {
   const [idEditando, setIdEditando] = useState(null);
   const [filaEditada, setFilaEditada] = useState({});
 
-  // ==========================================
-  // 2. NUEVOS ESTADOS PARA LOS FILTROS
-  // ==========================================
+  
   const [busqueda, setBusqueda] = useState('');
   const [filtroCategoria, setFiltroCategoria] = useState('Todas');
 
-  // Lógica "mágica" de filtrado en tiempo real
-  // React re-calculará esto automáticamente cada vez que el usuario escriba algo
+  
   const productosFiltrados = productos.filter((p) => {
     const coincideNombre = p.nombre.toLowerCase().includes(busqueda.toLowerCase());
     const coincideCategoria = filtroCategoria === 'Todas' || p.categoria === filtroCategoria;
     return coincideNombre && coincideCategoria;
   });
 
-  // ==========================================
-  // 3. LÓGICA CRUD (Create, Update, Delete)
-  // ==========================================
+  
   const handleAgregar = (e) => {
     e.preventDefault();
-    // TODO [Spring Boot]: fetch POST
+    
     const nuevoId = productos.length > 0 ? Math.max(...productos.map(p => p.id)) + 1 : 1;
     setProductos([...productos, { ...nuevoProd, id: nuevoId }]);
     setNuevoProd({ nombre: '', categoria: 'Mobiliario', cantidad: '', precio: '' });
@@ -44,7 +37,7 @@ const GestionInventario = () => {
 
   const handleEliminar = (id) => {
     if (window.confirm("¿Estás seguro de que deseas eliminar este artículo permanentemente?")) {
-      // TODO [Spring Boot]: fetch DELETE
+      
       setProductos(productos.filter(p => p.id !== id));
     }
   };
@@ -55,20 +48,18 @@ const GestionInventario = () => {
   };
 
   const guardarCambios = (id) => {
-    // TODO [Spring Boot]: fetch PUT
+    
     const nuevosProductos = productos.map(p => p.id === id ? filaEditada : p);
     setProductos(nuevosProductos);
     setIdEditando(null);
   };
 
-  // ==========================================
-  // 4. INTERFAZ VISUAL
-  // ==========================================
+  
   return (
     <div className="container mt-5 mb-5">
       <h2 className="text-center mb-4 text-dark fw-bold">Inventario - Espacio Casona JMS</h2>
 
-      {/* --- PANEL: AGREGAR NUEVO --- */}
+     
       <div className="card shadow-sm mb-4 border-0">
         <div className="card-header text-white" style={{ backgroundColor: '#2e7d32' }}>
           <h5 className="mb-0">Registrar Nuevo Artículo</h5>
@@ -104,7 +95,7 @@ const GestionInventario = () => {
         </div>
       </div>
 
-      {/* --- NUEVO PANEL: FILTROS DE BÚSQUEDA --- */}
+      
       <div className="row mb-3">
         <div className="col-md-8">
           <input 
@@ -127,7 +118,7 @@ const GestionInventario = () => {
         </div>
       </div>
 
-      {/* --- PANEL: TABLA DE DATOS --- */}
+      
       <div className="card shadow-sm border-0">
         <div className="card-body p-0">
           <div className="table-responsive">
@@ -143,7 +134,7 @@ const GestionInventario = () => {
                 </tr>
               </thead>
               <tbody>
-                {/* IMPORTANTE: Ahora mapeamos 'productosFiltrados' en lugar de 'productos' */}
+               
                 {productosFiltrados.map(p => (
                   <tr key={p.id}>
                     <td className="ps-4 fw-bold text-secondary">#{p.id}</td>
@@ -193,7 +184,7 @@ const GestionInventario = () => {
                   </tr>
                 ))}
                 
-                {/* Mensaje dinámico si la búsqueda no encuentra nada */}
+               
                 {productosFiltrados.length === 0 && (
                   <tr>
                     <td colSpan="6" className="text-center py-5 text-muted">

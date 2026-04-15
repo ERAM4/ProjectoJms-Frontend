@@ -57,9 +57,7 @@ const Footer = () => {
             <p>
               <Link to="/" className="link" onClick={scrollToTop}>Inicio</Link>
             </p>
-            <p>
-              <Link to="/ayuda" className="link" onClick={scrollToTop}>Acerca de</Link>
-            </p>
+            
             <p>
               <a href="#" className="link" onClick={scrollToTop}>Servicios</a>
             </p>

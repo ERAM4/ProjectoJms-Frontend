@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import Ayuda from './pages/ayuda.jsx'; 
+import AgendaCitas from './pages/AgendaCitas.jsx';
 import Servicios from './pages/servicios.jsx';
 import Inicio from './pages/inicio.jsx'
 import Registro from './pages/registro.jsx'
@@ -9,8 +9,10 @@ import Login from './pages/login.jsx'
 import Catalogo from './pages/catalogo.jsx'
 import StockAdmin from './pages/stockAdmin.jsx'
 
+import Testimonios from './components/Testimonios.jsx'
 import NavBar from "./components/NavBar.jsx"
 import Footer from "./components/Footer.jsx"
+
 
 import './App.css'
 
@@ -38,15 +40,18 @@ function App() {
           
           {/* Aquí agregarás las demás rutas más adelante */}
           <Route path="/servicios" element={<Servicios />} /> 
-          <Route path="/ayuda" element={<Ayuda />} />
+          
           <Route path="/registro" element={<Registro />} />
           <Route path="/login" element={<Login />} />
           <Route path="/catalogo" element={<Catalogo />} />
           <Route path="/stockAdmin" element={<StockAdmin />} />
+          <Route path="/agendaCitas" element={<AgendaCitas />} />
+          <Route path="/testimonios" element={<Testimonios/>} />
+           
 
         </Routes>
       </div>
-      {/* 4. El Footer va ABAJO y FUERA de las rutas. Así siempre estará al final. */}
+     
       <Footer />
       </BrowserRouter>
       </div>

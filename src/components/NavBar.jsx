@@ -18,12 +18,11 @@ export default function NavBar() {
             {/* Agregamos 'ms-auto' aquí para empujar todo a la derecha */}
             <div className="navbar-nav ms-auto">
               <Link className="nav-link active" aria-current="page" to="/">Inicio</Link>
-              <Link className="nav-link" to="/ayuda">Ayuda</Link>
               <Link className="nav-link" to="/registro">Crear Cuenta</Link>
-              <Link className="nav-link" to="/login">Iniciar Sesion</Link>
               <Link className="nav-link" to="/catalogo">Catalogo</Link>
-              <Link className="nav-link" to="/stockAdmin">Stock</Link>
-
+            
+              
+              
             </div>
           </div>
           

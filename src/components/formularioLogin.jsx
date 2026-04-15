@@ -26,35 +26,40 @@ const LoginUsuario = () => {
     setError(null);
 
     try {
-    
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // 1. CORREGIDO: Puerto 8081 en lugar de 8080
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8081';
 
-      
-      const usuarioGuardado = localStorage.getItem('usuarioCasona');
+      // 2. CORREGIDO: La ruta completa es /api/usuarios/login
+      const response = await fetch(`${apiUrl}/api/usuarios/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credenciales),
+      });
 
-      if (!usuarioGuardado) {
-        throw new Error('No existe ninguna cuenta registrada en este navegador.');
+      // 3. Capturar la respuesta
+      // Nota: Si el error es 401, a veces response.json() falla si el body está vacío.
+      // Es mejor verificar response.ok primero.
+      if (!response.ok) {
+        const errorData = await response.text(); // Leemos el mensaje de texto "Correo o contraseña incorrectos"
+        throw new Error(errorData || 'Credenciales incorrectas');
       }
 
-      
-      const usuarioObj = JSON.parse(usuarioGuardado);
+      const data = await response.json();
 
-      
-      if (usuarioObj.correo !== credenciales.correo || usuarioObj.password !== credenciales.password) {
-        throw new Error('Correo o contraseña incorrectos. Verifica tus datos.');
-      }
-
-      
+      // 4. ¡Login Exitoso! 
       localStorage.setItem('sesionIniciada', 'true');
-      localStorage.setItem('nombreUsuario', usuarioObj.nombre); // Guardamos el nombre por si quieres mostrar "Hola, [Nombre]" en el NavBar
-
       
-      navigate('/');
+      if (data.nombre) {
+         localStorage.setItem('nombreUsuario', data.nombre);
+      }
 
-      
+      // 5. Redirigimos (Asegúrate de tener esta ruta en tu App.js)
+      navigate('/'); 
 
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'No se pudo conectar con el servidor.');
     } finally {
       setIsLoading(false);
     }
@@ -67,8 +72,9 @@ const LoginUsuario = () => {
         display: 'flex',
         alignItems: 'center',
         padding: '50px 15px', 
+        // Fondo rojo vino profundo con transparencia
         backgroundImage: `
-          linear-gradient(to right, rgba(49, 212, 109, 0.7), rgba(62, 114, 33, 0.81)),
+          linear-gradient(to right, rgba(140, 45, 45, 0.85), rgba(105, 36, 36, 0.81)),
           url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1920&q=80')
         `,
         backgroundSize: 'cover',
@@ -81,14 +87,14 @@ const LoginUsuario = () => {
           <div className="col-12 col-md-8 col-lg-6 col-xl-5"> 
             <div className="card" style={{ borderRadius: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
               <div className="card-body p-5">
-                <h2 className="text-uppercase text-center mb-5" style={{ color: '#355E3B' }}>Iniciar Sesión</h2>
+                <h2 className="text-uppercase text-center mb-5" style={{ color: '#722F37' }}>Iniciar Sesión</h2>
 
                 {error && <div className="alert alert-danger">{error}</div>}
 
                 <form onSubmit={handleSubmit}>
 
                   <div className="form-outline mb-4">
-                    <label className="form-label fw-bold mb-1" htmlFor="correo" style={{ color: '#556B2F' }}>
+                    <label className="form-label mb-1" htmlFor="correo" style={{ color: '#722F37', fontWeight: 'bold' }}>
                       Tu Correo Electrónico
                     </label>
                     <input 
@@ -103,7 +109,7 @@ const LoginUsuario = () => {
                   </div>
 
                   <div className="form-outline mb-4">
-                    <label className="form-label fw-bold mb-1" htmlFor="password" style={{ color: '#556B2F' }}>
+                    <label className="form-label mb-1" htmlFor="password" style={{ color: '#722F37', fontWeight: 'bold' }}>
                       Contraseña
                     </label>
                     <input 
@@ -118,18 +124,18 @@ const LoginUsuario = () => {
                   </div>
 
                   <div className="d-flex justify-content-end mb-4">
-                    <a href="#!" className="text-muted"><small>¿Olvidaste tu contraseña?</small></a>
+                    <a href="#!" style={{ color: '#722F37' }}><small>¿Olvidaste tu contraseña?</small></a>
                   </div>
 
                   <div className="d-flex justify-content-center">
                     <button 
                       type="submit" 
                       disabled={isLoading}
-                      className="btn btn-success btn-block btn-lg text-body border-0 shadow-sm"
+                      className="btn btn-block btn-lg border-0 shadow-sm"
                       style={{ 
                         width: '100%', 
-                        background: 'linear-gradient(to right, #84fab0, #8fd3f4)',
-                        color: '#333',
+                        background: '#D4AF37', // Dorado Casona
+                        color: 'white',
                         fontWeight: 'bold'
                       }}
                     >
@@ -138,7 +144,7 @@ const LoginUsuario = () => {
                   </div>
 
                   <p className="text-center text-muted mt-5 mb-0">
-                    ¿Aún no tienes una cuenta? <Link to="/registro" className="fw-bold text-body"><u>Regístrate aquí</u></Link>
+                    ¿Aún no tienes una cuenta? <Link to="/registro" className="fw-bold" style={{ color: '#722F37' }}><u>Regístrate aquí</u></Link>
                   </p>
 
                 </form>
