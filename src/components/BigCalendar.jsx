@@ -3,13 +3,13 @@ import { Calendar, dayjsLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import dayjs from 'dayjs';
 import "dayjs/locale/es";
+import Swal from 'sweetalert2'; // <-- Importación de SweetAlert2
 
 // Configuramos dayjs en español
 dayjs.locale("es");
 const localizer = dayjsLocalizer(dayjs);
 
 // --- FUNCIÓN PARA MAYÚSCULAS ---
-// Toma cualquier texto (ej: "abril 2026") y lo devuelve como "Abril 2026"
 const capitalize = (str) => {
   if (!str) return '';
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -27,17 +27,18 @@ export default function BigCalendar() {
   });
 
   // ==========================================
-  // REGLAS DE NEGOCIO: LÍMITES DE HORARIO
-  // Definimos que la Casona atiende de 09:00 a 23:00
+  // LÍMITES DE HORARIO: 09:00 a 23:00
   // ==========================================
   const minTime = dayjs().set('hour', 9).set('minute', 0).toDate();
   const maxTime = dayjs().set('hour', 23).set('minute', 0).toDate();
 
   useEffect(() => {
+    // Datos simulados del usuario conectado
     setUsuarioActual({
       nombre: 'Juan', apellido: 'Pérez', correo: 'juan@email.com', telefono: '+56912345678'
     });
 
+    // Reserva de prueba inicial
     setEvents([
       {
         id: 1,
@@ -58,37 +59,59 @@ export default function BigCalendar() {
     return { style: { backgroundColor, borderRadius: '5px', color: 'white', border: 'none', display: 'block' } };
   };
 
+  // ==========================================
+  // LÓGICA DE SELECCIÓN Y REGLAS DE NEGOCIO
+  // ==========================================
   const handleSelectSlot = (slotInfo) => {
     if (isAdmin) return; 
 
-    // ==========================================
-    // REGLA 1: BLOQUEAR FECHAS PASADAS
-    // ==========================================
     const ahora = dayjs();
     const inicioSeleccionado = dayjs(slotInfo.start);
+    const finSeleccionado = dayjs(slotInfo.end);
 
+    // REGLA 1: BLOQUEAR FECHAS PASADAS
     if (inicioSeleccionado.isBefore(ahora, 'day')) {
-      alert("⚠️ No puedes agendar en fechas que ya pasaron.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Fecha no válida',
+        text: 'No puedes agendar en fechas que ya pasaron.',
+        confirmButtonColor: '#722F37'
+      });
       return;
     }
 
-    // ==========================================
-    // REGLA 2: EVITAR CHOQUES DE HORARIO
-    // ==========================================
+    // REGLA 2: DURACIÓN MÍNIMA DE 3 HORAS
+    const duracionHoras = finSeleccionado.diff(inicioSeleccionado, 'hour', true);
+    
+    if (duracionHoras < 3) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Duración insuficiente',
+        text: 'Para arrendar el espacio, la reserva debe ser de al menos 3 horas.',
+        confirmButtonColor: '#722F37'
+      });
+      return;
+    }
+
+    // REGLA 3: EVITAR CHOQUES DE HORARIO
     const estaOcupado = events.some(e => {
-      const nuevoInicio = dayjs(slotInfo.start);
-      const nuevoFin = dayjs(slotInfo.end);
       const eventoInicio = dayjs(e.start);
       const eventoFin = dayjs(e.end);
       return (e.estado === 'PENDIENTE' || e.estado === 'CONFIRMADA') && 
-             (nuevoInicio.isBefore(eventoFin) && nuevoFin.isAfter(eventoInicio));
+             (inicioSeleccionado.isBefore(eventoFin) && finSeleccionado.isAfter(eventoInicio));
     });
 
     if (estaOcupado) {
-      alert("⚠️ Horario no disponible. Ya existe una solicitud en este tramo.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Horario no disponible',
+        text: 'Ya existe una solicitud en este tramo horario.',
+        confirmButtonColor: '#722F37'
+      });
       return;
     }
 
+    // Si pasa las validaciones, mostramos el modal para confirmar
     setEventoSeleccionado(null);
     setSelectedSlot(slotInfo); 
     setIsModalOpen(true);      
@@ -99,6 +122,9 @@ export default function BigCalendar() {
     setIsModalOpen(true);
   };
 
+  // ==========================================
+  // ACCIONES: SOLICITAR Y GESTIONAR
+  // ==========================================
   const handleSolicitarHora = () => {
     const nuevaReserva = {
       id: Date.now(),
@@ -111,6 +137,15 @@ export default function BigCalendar() {
 
     setEvents([...events, nuevaReserva]);
     setIsModalOpen(false);
+    
+    // Feedback visual para el cliente
+    Swal.fire({
+      icon: 'success',
+      title: '¡Solicitud enviada!',
+      text: 'El administrador revisará tu petición a la brevedad.',
+      confirmButtonColor: '#722F37',
+      timer: 3000
+    });
   };
 
   const handleCambiarEstado = (nuevoEstado) => {
@@ -119,6 +154,18 @@ export default function BigCalendar() {
     );
     setEvents(eventosActualizados);
     setIsModalOpen(false);
+
+    // Feedback visual (Toast) para el administrador
+    Swal.fire({
+      icon: 'success',
+      title: 'Estado actualizado',
+      text: `La reserva ahora está: ${nuevoEstado}`,
+      confirmButtonColor: '#722F37',
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000
+    });
   };
 
   const misReservas = events.filter(e => e.cliente.correo === usuarioActual.correo);
@@ -179,14 +226,10 @@ export default function BigCalendar() {
               onSelectSlot={handleSelectSlot} 
               onSelectEvent={handleSelectEvent} 
               eventPropGetter={eventStyleGetter} 
-              
-              
               min={minTime} 
               max={maxTime} 
-              
               messages={mensajesEspañol}
               formats={formatosPersonalizados}
-              
               style={{ height: "60vh", width: "100%" }}
             />
           </div>
