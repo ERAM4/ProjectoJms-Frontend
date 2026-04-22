@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Banner from "../components/Banner.jsx";
 import Testimonios from '../components/Testimonios.jsx';
+import MapaCasona from '../components/MapaCasona.jsx'
+
 
 function Inicio() {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -126,7 +128,7 @@ function Inicio() {
       </div>
       
       <Testimonios/>
-
+      <MapaCasona/>   
       {/* ========================================== */}
       {/* LA VENTANA EMERGENTE (MODAL) DEL ADMIN     */}
       {/* ========================================== */}

@@ -13,7 +13,7 @@ import AgendaPrincipal from './components/AgendaPrincipal';
 import Testimonios from './components/Testimonios.jsx'
 import NavBar from "./components/NavBar.jsx"
 import Footer from "./components/Footer.jsx"
-
+import MapaCasona from "./components/MapaCasona.jsx"
 
 import './App.css'
 
