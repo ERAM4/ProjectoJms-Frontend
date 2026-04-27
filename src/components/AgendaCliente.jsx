@@ -4,6 +4,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import dayjs from 'dayjs';
 import "dayjs/locale/es";
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom'; // 🔥 1. Importamos useNavigate para la redirección
 
 dayjs.locale("es");
 const localizer = dayjsLocalizer(dayjs);
@@ -15,6 +16,8 @@ export default function AgendaCliente() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate(); // 🔥 2. Activamos el navegador interno de React
 
   const minTime = dayjs().set('hour', 9).set('minute', 0).toDate();
   const maxTime = dayjs().set('hour', 23).set('minute', 0).toDate();
@@ -42,6 +45,26 @@ export default function AgendaCliente() {
   };
 
   const handleSelectSlot = (slotInfo) => {
+    // 🛑 3. EL GUARDIA DE SEGURIDAD VISUAL 🛑
+    if (!usuarioLogueado || !usuarioLogueado.id) {
+      Swal.fire({
+        title: '¡Únete a la familia JMS!',
+        text: 'Para agendar una hora en la Casona, necesitas iniciar sesión o crear una cuenta gratuita.',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#722F37',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ir a Iniciar Sesión',
+        cancelButtonText: 'Seguir mirando'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate('/login'); // Redirige suavemente sin recargar la página
+        }
+      });
+      return; // Detenemos la función para que no abra el modal
+    }
+
+    // ✅ Si el usuario SI está logueado, sigue el flujo normal:
     const ahora = dayjs();
     const inicio = dayjs(slotInfo.start);
     const fin = dayjs(slotInfo.end);
@@ -85,7 +108,6 @@ export default function AgendaCliente() {
     finally { setIsLoading(false); }
   };
 
-
   const eventosCalendarioPrivado = events
     .filter(e => e.estado !== 'RECHAZADO')
     .map(e => {
@@ -96,7 +118,6 @@ export default function AgendaCliente() {
       }
     });
 
-  
   const misReservasOrdenadas = events
     .filter(e => e.usuario && e.usuario.id?.toString() === usuarioLogueado.id?.toString())
     .sort((a, b) => new Date(a.start) - new Date(b.start));
@@ -109,7 +130,7 @@ export default function AgendaCliente() {
       <div className="card shadow-lg border-0 p-4 bg-white mb-5" style={{ borderRadius: '15px' }}>
         <Calendar
           localizer={localizer}
-          events={eventosCalendarioPrivado} // Usamos la lista enmascarada
+          events={eventosCalendarioPrivado} 
           selectable
           onSelectSlot={handleSelectSlot}
           eventPropGetter={(event) => ({
