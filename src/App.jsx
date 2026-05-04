@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 
 // Vistas
+import Perfil from './pages/perfil.jsx'; 
 import Servicios from './pages/servicios.jsx';
 import Inicio from './pages/inicio.jsx'
 import Registro from './pages/registro.jsx'
@@ -52,6 +53,15 @@ function App() {
           <Route path="/agendaCitas" element={<AgendaPrincipal />} />
           <Route path="/agendaCliente" element={<AgendaCliente />} />
 
+          {/* 🔥 RUTA PROTEGIDA: Solo usuarios logueados (sean Admin o Clientes) pueden entrar */}
+            <Route 
+              path="/perfil" 
+              element={
+              <ProtectedRoute>
+                <Perfil />
+              </ProtectedRoute>}/>
+
+              
           {/* =========================================
               🔴 RUTAS DE ADMIN (Protegidas)
               ========================================= */}

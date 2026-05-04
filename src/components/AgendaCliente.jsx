@@ -125,7 +125,7 @@ export default function AgendaCliente() {
   return (
     <div className="container mt-4" style={{ minHeight: '80vh', paddingBottom: '40px' }}>
       
-      <h2 className="fw-bold mb-4" style={{ color: '#722F37' }}>📅 Agenda tu Evento</h2>
+      <h2 className="fw-bold mb-4" style={{ color: '#722F37' }}>📅 Consulta tu fecha </h2>
       
       <div className="card shadow-lg border-0 p-4 bg-white mb-5" style={{ borderRadius: '15px' }}>
         <Calendar

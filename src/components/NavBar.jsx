@@ -11,18 +11,43 @@ export default function NavBar() {
   // 🔥 ESTADOS PARA EL USUARIO LOGUEADO
   const [usuario, setUsuario] = useState(null);
   const [rolUsuario, setRolUsuario] = useState(null);
+  const [verificando, setVerificando] = useState(false); // 👈 Nuevo estado para el "Modo Paranoico"
 
+  // =========================================================
+  // 🔥 VERIFICACIÓN SILENCIOSA CON EL BACKEND (MODO PARANOICO)
+  // =========================================================
   useEffect(() => {
     const id = localStorage.getItem('idUsuario');
     const nombre = localStorage.getItem('nombreUsuario');
-    const rol = localStorage.getItem('rolUsuario');
 
     if (id) {
       setUsuario(nombre);
-      setRolUsuario(rol);
+      setVerificando(true); // 👈 Activamos el círculo de carga
+
+      // Ya no confiamos en el localStorage para el rol, le preguntamos directo a Spring Boot
+      fetch(`http://localhost:8081/api/usuarios/verificar/${id}`)
+        .then(response => {
+          if (!response.ok) throw new Error("Sesión inválida o usuario no existe");
+          return response.json();
+        })
+        .then(data => {
+          const rolRealBD = data.rol;
+          setRolUsuario(rolRealBD); // 👈 Spring Boot dicta el rol real
+          localStorage.setItem('rolUsuario', rolRealBD); // Corregimos si el usuario intentó hacer trampa
+          setVerificando(false); // 👈 Apagamos el círculo de carga
+        })
+        .catch(error => {
+          console.error("Error de seguridad al recargar:", error);
+          localStorage.clear();
+          setUsuario(null);
+          setRolUsuario(null);
+          setVerificando(false); // 👈 Apagamos el círculo de carga en caso de error
+        });
+
     } else {
       setUsuario(null);
       setRolUsuario(null);
+      setVerificando(false);
     }
   }, [location]);
 
@@ -90,8 +115,14 @@ export default function NavBar() {
               Inicio
             </NavLink>
 
-            {/* LINKS CONDICIONALES SEGÚN ROL */}
-            {rolUsuario === 'ADMIN' ? (
+            {/* 🔥 LINKS CONDICIONALES PROTEGIDOS VISUALMENTE 🔥 */}
+            {verificando ? (
+              <div className="d-flex align-items-center mx-3">
+                <div className="spinner-border spinner-border-sm" style={{ color: '#722F37' }} role="status">
+                  <span className="visually-hidden">Verificando...</span>
+                </div>
+              </div>
+            ) : rolUsuario === 'ADMIN' ? (
               <>
                 <NavLink className={({ isActive }) => `nav-link nav-link-custom${isActive ? ' active-link' : ''}`} to="/agendaAdmin">
                   Panel Reservas
@@ -126,6 +157,32 @@ export default function NavBar() {
                 <span className="fw-bold" style={{ color: '#722F37' }}>
                   👋 Hola, {usuario}
                 </span>
+
+                {/* BOTÓN DE PERFIL */}
+                <NavLink to="/perfil" style={{ textDecoration: 'none' }}>
+                  <span
+                    className="btn btn-sm px-3 py-1 fw-semibold"
+                    style={{
+                      border: '2px solid #722F37',
+                      color: '#722F37',
+                      borderRadius: '20px',
+                      transition: 'all 0.25s',
+                      backgroundColor: 'transparent'
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.backgroundColor = '#722F37';
+                      e.currentTarget.style.color = 'white';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.color = '#722F37';
+                    }}
+                  >
+                    👤 Mi Perfil
+                  </span>
+                </NavLink>
+
+                {/* BOTÓN CERRAR SESIÓN */}
                 <button 
                   onClick={handleLogout}
                   className="btn btn-sm px-3 py-1 fw-semibold"
@@ -134,10 +191,10 @@ export default function NavBar() {
                     color: 'white',
                     borderRadius: '20px',
                     border: 'none',
-                    transition: 'all 0.25s', // Animación agregada
+                    transition: 'all 0.25s',
                   }}
-                  onMouseEnter={e => e.currentTarget.style.backgroundColor = '#5a2229'} // Oscurece al pasar el mouse
-                  onMouseLeave={e => e.currentTarget.style.backgroundColor = '#722F37'} // Vuelve al rojo original
+                  onMouseEnter={e => e.currentTarget.style.backgroundColor = '#5a2229'} 
+                  onMouseLeave={e => e.currentTarget.style.backgroundColor = '#722F37'} 
                 >
                   Cerrar Sesión
                 </button>
