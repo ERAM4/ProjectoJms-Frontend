@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2'; // 🔥 Importamos SweetAlert2
+import Swal from 'sweetalert2'; 
 
 const LoginUsuario = () => {
   const [formData, setFormData] = useState({
@@ -50,7 +50,7 @@ const LoginUsuario = () => {
          localStorage.setItem('rolUsuario', data.usuario.rol || 'USUARIO'); 
       }
 
-      // 🔥 ALERTA DE BIENVENIDA (Se cierra sola) 🔥
+      // 🔥 ALERTA DE BIENVENIDA 🔥
       Swal.fire({
         icon: 'success',
         title: `¡Hola de nuevo, ${data.usuario?.nombre || 'Usuario'}!`,
@@ -58,8 +58,10 @@ const LoginUsuario = () => {
         timer: 2000, 
         timerProgressBar: true,
         showConfirmButton: false,
+        background: '#F3E7E4',
+        color: '#16181D',
         willClose: () => {
-          navigate('/'); // Redirige al calendario o home después de cerrarse
+          navigate('/'); 
         }
       });
 
@@ -69,7 +71,9 @@ const LoginUsuario = () => {
         icon: 'error',
         title: 'Acceso Denegado',
         text: err.message || 'Error al conectar con el servidor.',
-        confirmButtonColor: '#722F37'
+        confirmButtonColor: '#16181D',
+        background: '#F3E7E4',
+        color: '#16181D'
       });
     } finally {
       setIsLoading(false);
@@ -82,10 +86,11 @@ const LoginUsuario = () => {
         minHeight: '100vh', 
         display: 'flex',
         alignItems: 'center',
-        padding: '50px 15px', 
+        padding: '60px 15px', 
+        // 🔥 Fondo inmersivo idéntico al Registro 🔥
         backgroundImage: `
-          linear-gradient(to right, rgba(140, 45, 45, 0.85), rgba(105, 36, 36, 0.81)),
-          url('https://i.pinimg.com/originals/11/67/ce/1167ce7055b195fe92b57ea7d18b0bd2.jpg')
+          linear-gradient(to right, rgba(22, 24, 29, 0.92), rgba(22, 24, 29, 0.75)),
+          url('https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1920&q=80')
         `,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
@@ -95,37 +100,44 @@ const LoginUsuario = () => {
       <div className="container">
         <div className="row d-flex justify-content-center align-items-center">
           <div className="col-12 col-md-8 col-lg-6 col-xl-5">
-            <div className="card" style={{ borderRadius: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
+            
+            <div className="card border-0" style={{ borderRadius: '20px', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', backgroundColor: '#ffffff' }}>
               <div className="card-body p-5">
-                <h2 className="text-uppercase text-center mb-5" style={{ color: '#722F37', fontWeight: 'bold' }}>
-                  Iniciar Sesión
-                </h2>
+                
+                <div className="text-center mb-4">
+                  <h2 className="fw-bold mb-2" style={{ color: '#16181D', fontFamily: "'Georgia', serif", fontSize: '2.2rem' }}>
+                    Iniciar Sesión
+                  </h2>
+                  <div style={{ width: '50px', height: '3px', backgroundColor: '#D4AF37', margin: '0 auto' }}></div>
+                </div>
 
                 <form onSubmit={handleSubmit}>
                   
-                  <div className="form-outline mb-4">
-                    <label className="form-label mb-1" htmlFor="correo" style={{ color: '#722F37', fontWeight: 'bold' }}>Correo Electrónico</label>
+                  <div className="mb-4">
+                    <label className="form-label" htmlFor="correo" style={{ color: '#16181D', fontWeight: 'bold', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Correo Electrónico</label>
                     <input 
                       type="email" 
                       id="correo" 
                       name="correo" 
                       value={formData.correo} 
                       onChange={handleChange} 
-                      className="form-control form-control-lg" 
+                      className="form-control" 
+                      style={{ padding: '12px', borderRadius: '10px', border: '1px solid #ddd', backgroundColor: '#fafafa' }}
                       required 
                       autoComplete="email"
                     />
                   </div>
 
-                  <div className="form-outline mb-5">
-                    <label className="form-label mb-1" htmlFor="password" style={{ color: '#722F37', fontWeight: 'bold' }}>Contraseña</label>
+                  <div className="mb-5">
+                    <label className="form-label" htmlFor="password" style={{ color: '#16181D', fontWeight: 'bold', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Contraseña</label>
                     <input 
                       type="password" 
                       id="password" 
                       name="password" 
                       value={formData.password} 
                       onChange={handleChange} 
-                      className="form-control form-control-lg" 
+                      className="form-control" 
+                      style={{ padding: '12px', borderRadius: '10px', border: '1px solid #ddd', backgroundColor: '#fafafa' }}
                       required 
                     />
                   </div>
@@ -134,21 +146,35 @@ const LoginUsuario = () => {
                     <button 
                       type="submit" 
                       disabled={isLoading}
-                      className="btn btn-block btn-lg border-0 shadow-sm"
+                      className="btn w-100 fw-bold shadow-sm"
                       style={{ 
-                        width: '100%', 
-                        background: '#D4AF37', 
-                        color: 'white',
-                        fontWeight: 'bold',
-                        transition: '0.3s'
+                        padding: '14px',
+                        background: '#16181D', 
+                        color: '#D4AF37',
+                        borderRadius: '30px',
+                        fontSize: '1.1rem',
+                        transition: 'all 0.3s ease',
+                        border: '2px solid #16181D'
+                      }}
+                      onMouseEnter={e => {
+                        if(!isLoading) {
+                          e.currentTarget.style.background = '#D4AF37';
+                          e.currentTarget.style.color = '#16181D';
+                        }
+                      }}
+                      onMouseLeave={e => {
+                        if(!isLoading) {
+                          e.currentTarget.style.background = '#16181D';
+                          e.currentTarget.style.color = '#D4AF37';
+                        }
                       }}
                     >
                       {isLoading ? 'Verificando datos...' : 'Ingresar'}
                     </button>
                   </div>
 
-                  <p className="text-center text-muted mt-5 mb-0">
-                    ¿No tienes una cuenta? <Link to="/registro" className="fw-bold" style={{ color: '#722F37' }}><u>Regístrate aquí</u></Link>
+                  <p className="text-center text-muted mt-4 mb-0" style={{ fontSize: '0.95rem' }}>
+                    ¿No tienes una cuenta? <Link to="/registro" style={{ color: '#16181D', fontWeight: 'bold', textDecoration: 'none', borderBottom: '2px solid #D4AF37' }}>Regístrate aquí</Link>
                   </p>
 
                 </form>
