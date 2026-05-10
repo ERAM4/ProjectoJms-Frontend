@@ -29,7 +29,8 @@ export default function AgendaAdmin() {
           end: new Date(res.fechaHoraFin)
         }));
         setEvents(adaptados);
-        setPendientes(adaptados.filter(e => e.estado === 'PENDIENTE').sort((a,b) => a.start - b.start));
+        // Ocultamos los bloqueos manuales de la tabla de pendientes
+        setPendientes(adaptados.filter(e => e.estado === 'PENDIENTE' && e.title !== '❌ Horario no disponible').sort((a,b) => a.start - b.start));
       }
     } catch (e) { 
       console.error("Error al cargar datos:", e); 
@@ -47,6 +48,7 @@ export default function AgendaAdmin() {
       confirmButtonColor: nuevoEstado === 'APROBADO' ? '#16181D' : '#d33',
       cancelButtonColor: '#aaa',
       confirmButtonText: 'Sí, confirmar',
+      cancelButtonText: 'Cancelar',
       background: '#F3E7E4',
       color: '#16181D'
     }).then(async (result) => {
@@ -75,13 +77,102 @@ export default function AgendaAdmin() {
     });
   };
 
+  // 🔥 FUNCIÓN PARA BLOQUEAR HORARIO (Al seleccionar espacio vacío)
+  const handleSelectSlot = (slotInfo) => {
+    const inicio = dayjs(slotInfo.start);
+    const fin = dayjs(slotInfo.end);
+
+    if (inicio.isBefore(dayjs(), 'minute')) {
+      Swal.fire({ icon: 'warning', title: 'Fecha pasada', text: 'No puedes bloquear fechas que ya pasaron.', confirmButtonColor: '#16181D', background: '#F3E7E4' });
+      return;
+    }
+
+    Swal.fire({
+      title: 'Bloquear Horario',
+      html: `¿Deseas marcar como <b>No Disponible</b> el:<br/> <br/> <span style="color:#D4AF37; font-weight:bold;">${inicio.format('DD/MM/YYYY')}</span> <br/> De ${inicio.format('HH:mm')} a ${fin.format('HH:mm')}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#16181D',
+      cancelButtonColor: '#666',
+      confirmButtonText: 'Sí, bloquear',
+      cancelButtonText: 'Cancelar',
+      background: '#F3E7E4',
+      color: '#16181D'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const bloque = {
+          title: '❌ Horario no disponible',
+          fechaHoraInicio: inicio.format('YYYY-MM-DDTHH:mm:ss'),
+          fechaHoraFin: fin.format('YYYY-MM-DDTHH:mm:ss'),
+          usuario: { id: localStorage.getItem('idUsuario') } 
+        };
+
+        try {
+          const response = await fetch(`${API_URL}/api/reservas/crear`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bloque)
+          });
+          if (response.ok) {
+            Swal.fire({ icon: 'success', title: 'Horario bloqueado', timer: 1500, showConfirmButton: false, background: '#F3E7E4' });
+            cargarDatos();
+          }
+        } catch (e) {
+          Swal.fire({ icon: 'error', title: 'Error al bloquear', background: '#F3E7E4' });
+        }
+      }
+    });
+  };
+
+  // 🔥 FUNCIÓN PARA DESBLOQUEAR / VER DETALLES (Al hacer clic en un evento)
+  const handleSelectEvent = (event) => {
+    if (event.title === '❌ Horario no disponible') {
+      Swal.fire({
+        title: 'Desbloquear Horario',
+        text: '¿Deseas volver a habilitar este horario para que los clientes puedan reservar?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#D4AF37',
+        cancelButtonColor: '#666',
+        confirmButtonText: '<span style="color:#16181D; font-weight:bold;">Sí, liberar horario</span>',
+        cancelButtonText: 'Cancelar',
+        background: '#16181D',
+        color: '#F3E7E4'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await fetch(`${API_URL}/api/reservas/eliminar/${event.id}`, { method: 'DELETE' });
+            if (response.ok) {
+              Swal.fire({ icon: 'success', title: 'Horario liberado', timer: 1500, showConfirmButton: false, background: '#F3E7E4', color: '#16181D' });
+              cargarDatos();
+            }
+          } catch (e) {
+            Swal.fire({ icon: 'error', title: 'Error al liberar', background: '#F3E7E4' });
+          }
+        }
+      });
+    } else {
+      Swal.fire({
+        title: 'Detalles de Reserva',
+        html: `<b>Cliente:</b> ${event.usuario?.nombre} ${event.usuario?.apellido} <br/> <b>Contacto:</b> ${event.usuario?.telefono || 'No registrado'} <br/> <b>Fecha:</b> ${dayjs(event.start).format('DD/MM/YYYY')} <br/> <b>Horario:</b> ${dayjs(event.start).format('HH:mm')} a ${dayjs(event.end).format('HH:mm')}<br/> <b>Estado:</b> ${event.estado}`,
+        icon: 'info',
+        confirmButtonColor: '#16181D',
+        background: '#F3E7E4',
+        color: '#16181D'
+      });
+    }
+  };
+
   // 🔥 ESTILO DE EVENTOS EN EL CALENDARIO
   const eventStyleGetter = (event) => {
     let backgroundColor = '#D4AF37'; // Dorado para Pendientes
     let color = '#16181D'; 
 
-    if (event.estado === 'APROBADO') {
-      backgroundColor = '#16181D'; // Azul Noche para Aprobados
+    if (event.title === '❌ Horario no disponible') {
+      backgroundColor = '#4b5563'; // Gris oscuro elegante para Bloqueados
+      color = '#F3E7E4'; 
+    } else if (event.estado === 'APROBADO') {
+      backgroundColor = '#16181D'; // Azul Noche para Aprobados Reales
       color = '#D4AF37'; 
     }
 
@@ -125,7 +216,7 @@ export default function AgendaAdmin() {
             Gestión de Reservas
           </h1>
           <p style={{ color: 'rgba(243, 231, 228, 0.7)', maxWidth: '560px', margin: '0 auto', lineHeight: 1.6, fontSize: '1.05rem', fontFamily: 'sans-serif' }}>
-            Supervisa la ocupación de la Casona y procesa las nuevas solicitudes de los clientes.
+            Selecciona un espacio en el calendario para <b>bloquear horarios</b>, o haz clic en uno bloqueado para <b>liberarlo</b>.
           </p>
         </div>
       </div>
@@ -134,11 +225,12 @@ export default function AgendaAdmin() {
         
         {/* 1. CALENDARIO MAESTRO */}
         <div className="card shadow-lg border-0 p-4 bg-white mb-5" style={{ borderRadius: '20px' }}>
-          <div className="d-flex justify-content-between align-items-center mb-4 px-2">
+          <div className="d-flex justify-content-between align-items-center mb-4 px-2 flex-wrap gap-2">
             <h4 className="fw-bold m-0" style={{ color: '#16181D', fontFamily: "'Georgia', serif" }}>Vista de Ocupación</h4>
-            <div className="d-flex gap-3">
-               <small><span style={{ color: '#16181D' }}>●</span> Aprobado</small>
-               <small><span style={{ color: '#D4AF37' }}>●</span> Pendiente</small>
+            <div className="d-flex gap-3 flex-wrap">
+               <small><span style={{ color: '#16181D' }}>●</span> Cliente Aprobado</small>
+               <small><span style={{ color: '#D4AF37' }}>●</span> Solicitud Pendiente</small>
+               <small><span style={{ color: '#4b5563' }}>●</span> Horario Bloqueado</small>
             </div>
           </div>
 
@@ -148,14 +240,16 @@ export default function AgendaAdmin() {
             .rbc-toolbar button { color: #16181D; border-radius: 20px; border: 1px solid #ddd; margin: 0 2px; }
             .rbc-toolbar button.rbc-active { background-color: #16181D; color: #D4AF37; border-color: #16181D; }
             .rbc-today { background-color: rgba(212, 175, 55, 0.05); }
-            .rbc-event { transition: transform 0.2s; }
+            .rbc-event { transition: transform 0.2s; cursor: pointer !important; }
             .rbc-event:hover { transform: scale(1.02); z-index: 10; }
           `}</style>
 
           <Calendar
             localizer={localizer}
             events={events.filter(e => e.estado !== 'RECHAZADO')}
-            selectable={false}
+            selectable={true} 
+            onSelectSlot={handleSelectSlot} 
+            onSelectEvent={handleSelectEvent} 
             eventPropGetter={eventStyleGetter}
             style={{ height: "65vh" }}
             messages={{

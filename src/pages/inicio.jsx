@@ -71,7 +71,7 @@ function Inicio() {
         
         <div className="container" style={{ marginTop: '50px' }}>
           
-          {/* TÍTULO DINÁMICO (AHORA EN BLANCO) */}
+          {/* TÍTULO DINÁMICO */}
           <div className="text-center mb-5 reveal-title">
             <h2 style={{ color: '#F3E7E4', fontFamily: "'Georgia', serif", fontWeight: 'bold', fontSize: '2.5rem' }}>
               {isAdmin ? 'Panel de Gestión Administrativa' : 'Descubre Nuestros Espacios'}
@@ -209,8 +209,11 @@ function Inicio() {
                 <p className="text-muted mt-2">Selecciona el módulo que deseas administrar hoy</p>
               </div>
 
+              {/* AHORA ES UNA CUADRÍCULA DE 2x2 PARA LOS 4 MÓDULOS */}
               <div className="row g-4">
-                <div className="col-12 col-md-4">
+                
+                {/* Módulo 1: Reservas */}
+                <div className="col-12 col-md-6">
                   <Link to="/agendaAdmin" className="text-decoration-none">
                     <div className="card h-100 text-center p-4 border-0 hover-lift" style={{ backgroundColor: '#F3E7E4', borderRadius: '15px' }}>
                       <h1 style={{ fontSize: '3rem', margin: 0 }}>📅</h1>
@@ -219,7 +222,8 @@ function Inicio() {
                   </Link>
                 </div>
 
-                <div className="col-12 col-md-4">
+                {/* Módulo 2: Inventario */}
+                <div className="col-12 col-md-6">
                   <Link to="/stockAdmin" className="text-decoration-none">
                     <div className="card h-100 text-center p-4 border-0 hover-lift" style={{ backgroundColor: '#F3E7E4', borderRadius: '15px' }}>
                       <h1 style={{ fontSize: '3rem', margin: 0 }}>📦</h1>
@@ -228,7 +232,8 @@ function Inicio() {
                   </Link>
                 </div>
 
-                <div className="col-12 col-md-4">
+                {/* Módulo 3: Galería */}
+                <div className="col-12 col-md-6">
                   <Link to="/galeria" className="text-decoration-none">
                     <div className="card h-100 text-center p-4 border-0 hover-lift" style={{ backgroundColor: '#F3E7E4', borderRadius: '15px' }}>
                       <h1 style={{ fontSize: '3rem', margin: 0 }}>🖼️</h1>
@@ -236,6 +241,17 @@ function Inicio() {
                     </div>
                   </Link>
                 </div>
+
+                {/* Módulo 4: Servicios */}
+                <div className="col-12 col-md-6">
+                  <Link to="/serviciosAdmin" className="text-decoration-none">
+                    <div className="card h-100 text-center p-4 border-0 hover-lift" style={{ backgroundColor: '#F3E7E4', borderRadius: '15px' }}>
+                      <h1 style={{ fontSize: '3rem', margin: 0 }}>🛎️</h1>
+                      <h5 className="fw-bold mt-3" style={{ color: '#16181D', fontFamily: "'Georgia', serif" }}>Servicios</h5>
+                    </div>
+                  </Link>
+                </div>
+
               </div>
 
               <button 

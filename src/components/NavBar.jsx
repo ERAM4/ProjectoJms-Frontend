@@ -162,7 +162,7 @@ export default function NavBar() {
                   <NavLink className={({ isActive }) => `nav-link nav-link-custom${isActive ? ' active-link' : ''}`} to="/galeria">
                     Gestión Galería
                   </NavLink>
-                  <NavLink className={({ isActive }) => `nav-link nav-link-custom${isActive ? ' active-link' : ''}`} to="/servicios">
+                  <NavLink className={({ isActive }) => `nav-link nav-link-custom${isActive ? ' active-link' : ''}`} to="/serviciosAdmin">
                     Gestión Servicios
                   </NavLink>
                 </>

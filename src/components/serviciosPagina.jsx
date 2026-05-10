@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 
 // =============================================
-// DATOS DEL CATÁLOGO
+// DATOS DE RESPALDO (Fallback por si el backend falla)
 // =============================================
-const servicios = [
+const SERVICIOS_DEMO = [
   {
     id: 1, categoria: 'Espacios', nombre: 'Salón Principal',
     descripcion: 'Amplio salón interior con capacidad para hasta 200 personas, ideal para banquetes, ceremonias y eventos corporativos. Equipado con iluminación regulable y climatización.',
@@ -22,73 +22,53 @@ const servicios = [
     detalles: ['3.000 m² de terreno', 'Árboles centenarios', 'Fuentes de agua', 'Iluminación exterior', 'Zona de cóctel', 'Estacionamiento privado'],
   },
   {
-    id: 3, categoria: 'Espacios', nombre: 'Terraza Panorámica',
-    descripcion: 'Terraza con vista al campo y la cordillera, equipada con toldos retráctiles. Espacio íntimo para grupos pequeños y cenas privadas bajo las estrellas.',
-    capacidad: '80 personas', precio: 'Desde $180.000',
-    imagen: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=800&fit=crop',
-    badge: null,
-    detalles: ['Vista panorámica', 'Toldos retráctiles', 'Calefactores exteriores', 'Barra móvil disponible', 'Mobiliario lounge', 'Íntimo y exclusivo'],
-  },
-  {
-    id: 4, categoria: 'Servicios', nombre: 'Catering Premium',
-    descripcion: 'Servicio de gastronomía de autor con menús personalizados. Cocineros con experiencia en cocina chilena e internacional. Incluye servicio de mozos.',
+    id: 3, categoria: 'Servicios', nombre: 'Catering Premium',
+    descripcion: 'Servicio de gastronomía de autor con menús personalizados. Cocineros con experiencia en cocina chilena e internacional.',
     capacidad: 'Sin límite', precio: 'Desde $25.000 /persona',
     imagen: 'https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=800&fit=crop',
-    badge: 'Exclusivo', badgeColor: '#16181D', // 🔥 Cambiado al Azul Noche
-    detalles: ['Menú personalizado', 'Cocina internacional', 'Mozos incluidos', 'Vajilla de lujo', 'Coordinador de banquetes', 'Opciones veganas'],
-  },
-  {
-    id: 5, categoria: 'Servicios', nombre: 'Decoración Temática',
-    descripcion: 'Equipo de decoradores profesionales que transforman cada rincón del espacio según la temática de tu evento. Flores, telas, luminarias y más.',
-    capacidad: 'Personalizable', precio: 'Desde $150.000',
-    imagen: 'https://images.unsplash.com/photo-1478146059778-26028b07395a?q=80&w=800&fit=crop',
-    badge: null,
-    detalles: ['Decoradores profesionales', 'Flores naturales', 'Arcos florales', 'Luminarias decorativas', 'Telas y drapeados', 'Visita de diseño incluida'],
-  },
-  {
-    id: 6, categoria: 'Servicios', nombre: 'Fotografía y Video',
-    descripcion: 'Equipo de fotógrafos y videógrafos especializados en eventos sociales. Entrega de galería digital y video editado en menos de 30 días.',
-    capacidad: 'Full día', precio: 'Desde $200.000',
-    imagen: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=800&fit=crop',
-    badge: null,
-    detalles: ['Cobertura completa', 'Fotografía artística', 'Video cinematográfico', 'Galería digital en 7 días', 'Edición profesional', 'Álbum físico opcional'],
-  },
-  {
-    id: 7, categoria: 'Paquetes', nombre: 'Paquete Matrimonio',
-    descripcion: 'Todo lo que necesitas para tu gran día en un solo paquete. Incluye salón, jardines, catering, decoración, fotografía y coordinador de bodas personal.',
-    capacidad: 'Hasta 200 personas', precio: 'Desde $2.500.000',
-    imagen: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?q=80&w=800&fit=crop',
-    badge: 'Todo Incluido', badgeColor: '#16181D', // 🔥 Cambiado al Azul Noche
-    detalles: ['Salón + Jardines', 'Catering completo', 'Decoración premium', 'Fotografía y video', 'Coordinador de bodas', 'Suite nupcial', 'Torta de matrimonio', 'Música en vivo'],
-  },
-  {
-    id: 8, categoria: 'Paquetes', nombre: 'Paquete Corporativo',
-    descripcion: 'Diseñado para empresas que buscan el escenario perfecto para reuniones, lanzamientos de productos y eventos de team building.',
-    capacidad: 'Hasta 150 personas', precio: 'Desde $800.000',
-    imagen: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=800&fit=crop',
-    badge: null,
-    detalles: ['Salón principal', 'Coffee break incluido', 'Almuerzo corporativo', 'Equipo audiovisual', 'WiFi alta velocidad', 'Coordinador de eventos', 'Estacionamiento', 'Factura disponible'],
-  },
-  {
-    id: 9, categoria: 'Paquetes', nombre: 'Paquete Celebración',
-    descripcion: 'Para cumpleaños, aniversarios y fiestas familiares. El paquete ideal para crear recuerdos inolvidables con las personas que más amas.',
-    capacidad: 'Hasta 100 personas', precio: 'Desde $450.000',
-    imagen: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=800&fit=crop',
-    badge: 'Familiar', badgeColor: '#D4AF37',
-    detalles: ['Salón o terraza', 'Decoración temática', 'Catering básico', 'DJ y sonido', 'Barra de tragos', 'Fotógrafo 4 horas', 'Torta personalizada', 'Coordinador de evento'],
-  },
+    badge: 'Exclusivo', badgeColor: '#16181D',
+    detalles: ['Menú personalizado', 'Cocina internacional', 'Mozos incluidos', 'Vajilla de lujo'],
+  }
 ];
 
-const categorias = ['Todos', 'Espacios', 'Servicios', 'Paquetes'];
+const categoriasTabs = ['Todos', 'Espacios', 'Servicios', 'Paquetes'];
 
 // =============================================
-// PÁGINA PRINCIPAL: CATÁLOGO
+// PÁGINA PRINCIPAL: CATÁLOGO DE SERVICIOS
 // =============================================
 export default function Catalogo() {
+  const [servicios, setServicios] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [categoriaActiva, setCategoriaActiva] = useState('Todos');
   const [modalServicio, setModalServicio] = useState(null);
   const [hoveredCard, setHoveredCard] = useState(null);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081';
+
+  // 🔥 1. Cargar servicios desde el backend al iniciar la página
+  useEffect(() => {
+    cargarServicios();
+  }, []);
+
+  const cargarServicios = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/servicios/todos`);
+      if (response.ok) {
+        const data = await response.json();
+        setServicios(data.length > 0 ? data : SERVICIOS_DEMO);
+      } else {
+        setServicios(SERVICIOS_DEMO); // Si hay error HTTP (ej. 500)
+      }
+    } catch (error) {
+      console.error("No se pudo conectar al backend. Cargando datos de muestra.");
+      setServicios(SERVICIOS_DEMO); // Si el servidor está apagado
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🔥 2. Filtrado dinámico según la pestaña seleccionada
   const serviciosFiltrados = categoriaActiva === 'Todos'
     ? servicios
     : servicios.filter(s => s.categoria === categoriaActiva);
@@ -98,7 +78,7 @@ export default function Catalogo() {
 
       <main style={{ flex: 1 }}>
 
-        {/* HERO */}
+        {/* HERO SECTION */}
         <div style={{
           background: 'linear-gradient(135deg, #16181D 0%, #1c1f26 60%, #0d0f12 100%)', // 🔥 Azul Noche
           padding: '70px 20px 55px',
@@ -131,10 +111,10 @@ export default function Catalogo() {
           </div>
         </div>
 
-        {/* FILTROS */}
+        {/* TABS DE FILTRADO */}
         <div className="container" style={{ paddingTop: '40px', paddingBottom: '8px' }}>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
-            {categorias.map(cat => (
+            {categoriasTabs.map(cat => (
               <button
                 key={cat}
                 onClick={() => setCategoriaActiva(cat)}
@@ -157,95 +137,105 @@ export default function Catalogo() {
           </p>
         </div>
 
-        {/* GRID DE CARDS */}
+        {/* GRID DE TARJETAS */}
         <div className="container" style={{ paddingBottom: '64px' }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-            gap: '24px',
-          }}>
-            {serviciosFiltrados.map(servicio => (
-              <div
-                key={servicio.id}
-                onMouseEnter={() => setHoveredCard(servicio.id)}
-                onMouseLeave={() => setHoveredCard(null)}
-                onClick={() => setModalServicio(servicio)}
-                className="card border-0"
-                style={{
-                  borderRadius: '15px',
-                  overflow: 'hidden',
-                  backgroundColor: '#ffffff',
-                  transform: hoveredCard === servicio.id ? 'translateY(-5px)' : 'translateY(0)',
-                  boxShadow: hoveredCard === servicio.id
-                    ? '0 16px 48px rgba(0,0,0,0.15)'
-                    : '0 4px 15px rgba(0,0,0,0.05)',
-                  transition: 'all 0.28s ease',
-                  cursor: 'pointer',
-                }}
-              >
-                {/* Imagen */}
-                <div style={{ position: 'relative', height: '210px', overflow: 'hidden' }}>
-                  <img
-                    src={servicio.imagen} alt={servicio.nombre}
-                    style={{
-                      width: '100%', height: '100%', objectFit: 'cover',
-                      transform: hoveredCard === servicio.id ? 'scale(1.06)' : 'scale(1)',
-                      transition: 'transform 0.4s ease',
-                    }}
-                  />
-                  <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(22,24,29,0.7) 0%, transparent 60%)' }} />
-                  <span style={{
-                    position: 'absolute', top: '12px', left: '12px',
-                    backgroundColor: 'rgba(255,255,255,0.9)', color: '#16181D',
-                    fontSize: '0.68rem', fontWeight: '700',
-                    padding: '3px 11px', borderRadius: '20px',
-                    letterSpacing: '0.8px', textTransform: 'uppercase', fontFamily: 'sans-serif',
-                  }}>{servicio.categoria}</span>
-                  {servicio.badge && (
+          
+          {loading ? (
+            <div className="text-center py-5">
+               <div className="spinner-border" style={{ color: '#D4AF37' }} role="status"></div>
+               <p className="mt-3" style={{ color: '#16181D' }}>Cargando catálogo...</p>
+            </div>
+          ) : (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gap: '24px',
+            }}>
+              {serviciosFiltrados.map(servicio => (
+                <div
+                  key={servicio.id}
+                  onMouseEnter={() => setHoveredCard(servicio.id)}
+                  onMouseLeave={() => setHoveredCard(null)}
+                  onClick={() => setModalServicio(servicio)}
+                  className="card border-0"
+                  style={{
+                    borderRadius: '15px',
+                    overflow: 'hidden',
+                    backgroundColor: '#ffffff',
+                    transform: hoveredCard === servicio.id ? 'translateY(-5px)' : 'translateY(0)',
+                    boxShadow: hoveredCard === servicio.id
+                      ? '0 16px 48px rgba(0,0,0,0.15)'
+                      : '0 4px 15px rgba(0,0,0,0.05)',
+                    transition: 'all 0.28s ease',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {/* Imagen de la tarjeta */}
+                  <div style={{ position: 'relative', height: '210px', overflow: 'hidden' }}>
+                    <img
+                      src={servicio.imagen || 'https://via.placeholder.com/800x600?text=Sin+Imagen'} 
+                      alt={servicio.nombre}
+                      style={{
+                        width: '100%', height: '100%', objectFit: 'cover',
+                        transform: hoveredCard === servicio.id ? 'scale(1.06)' : 'scale(1)',
+                        transition: 'transform 0.4s ease',
+                      }}
+                    />
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(22,24,29,0.7) 0%, transparent 60%)' }} />
                     <span style={{
-                      position: 'absolute', top: '12px', right: '12px',
-                      backgroundColor: servicio.badgeColor,
-                      color: servicio.badgeColor === '#D4AF37' ? '#16181D' : '#D4AF37',
+                      position: 'absolute', top: '12px', left: '12px',
+                      backgroundColor: 'rgba(255,255,255,0.9)', color: '#16181D',
                       fontSize: '0.68rem', fontWeight: '700',
-                      padding: '3px 11px', borderRadius: '20px', fontFamily: 'sans-serif',
-                    }}>{servicio.badge}</span>
-                  )}
-                </div>
-
-                {/* Body */}
-                <div className="card-body p-4">
-                  <h5 className="mb-2" style={{ color: '#16181D', fontFamily: 'Georgia, serif', fontWeight: 'bold', fontSize: '1.2rem' }}>
-                    {servicio.nombre}
-                  </h5>
-                  <p className="text-muted small mb-3" style={{ lineHeight: 1.6 }}>
-                    {servicio.descripcion.slice(0, 95)}...
-                  </p>
-                  <div className="d-flex gap-2 mb-4 flex-wrap">
-                    <span className="badge" style={{ backgroundColor: '#F3E7E4', color: '#16181D', fontWeight: '600', fontSize: '0.75rem', padding: '6px 12px', border: '1px solid #ddd' }}>
-                      👥 {servicio.capacidad}
-                    </span>
-                    <span className="badge" style={{ backgroundColor: '#16181D', color: '#D4AF37', fontWeight: '600', fontSize: '0.75rem', padding: '6px 12px' }}>
-                      💰 {servicio.precio}
-                    </span>
+                      padding: '3px 11px', borderRadius: '20px',
+                      letterSpacing: '0.8px', textTransform: 'uppercase', fontFamily: 'sans-serif',
+                    }}>{servicio.categoria}</span>
+                    
+                    {servicio.badge && (
+                      <span style={{
+                        position: 'absolute', top: '12px', right: '12px',
+                        backgroundColor: servicio.badgeColor || '#D4AF37',
+                        color: servicio.badgeColor === '#D4AF37' ? '#16181D' : '#D4AF37',
+                        fontSize: '0.68rem', fontWeight: '700',
+                        padding: '3px 11px', borderRadius: '20px', fontFamily: 'sans-serif',
+                      }}>{servicio.badge}</span>
+                    )}
                   </div>
-                  <button
-                    className="btn w-100 fw-bold"
-                    style={{
-                      backgroundColor: hoveredCard === servicio.id ? '#16181D' : 'transparent',
-                      color: hoveredCard === servicio.id ? '#D4AF37' : '#16181D',
-                      border: '2px solid #16181D',
-                      borderRadius: '10px',
-                      fontSize: '0.88rem',
-                      transition: 'all 0.25s ease',
-                    }}
-                  >Ver detalles →</button>
+
+                  {/* Contenido de la tarjeta */}
+                  <div className="card-body p-4 d-flex flex-column">
+                    <h5 className="mb-2" style={{ color: '#16181D', fontFamily: 'Georgia, serif', fontWeight: 'bold', fontSize: '1.2rem' }}>
+                      {servicio.nombre}
+                    </h5>
+                    <p className="text-muted small mb-3 flex-grow-1" style={{ lineHeight: 1.6 }}>
+                      {servicio.descripcion.slice(0, 95)}...
+                    </p>
+                    <div className="d-flex gap-2 mb-4 flex-wrap">
+                      <span className="badge" style={{ backgroundColor: '#F3E7E4', color: '#16181D', fontWeight: '600', fontSize: '0.75rem', padding: '6px 12px', border: '1px solid #ddd' }}>
+                        👥 {servicio.capacidad}
+                      </span>
+                      <span className="badge" style={{ backgroundColor: '#16181D', color: '#D4AF37', fontWeight: '600', fontSize: '0.75rem', padding: '6px 12px' }}>
+                        💰 {servicio.precio}
+                      </span>
+                    </div>
+                    <button
+                      className="btn w-100 fw-bold mt-auto"
+                      style={{
+                        backgroundColor: hoveredCard === servicio.id ? '#16181D' : 'transparent',
+                        color: hoveredCard === servicio.id ? '#D4AF37' : '#16181D',
+                        border: '2px solid #16181D',
+                        borderRadius: '10px',
+                        fontSize: '0.88rem',
+                        transition: 'all 0.25s ease',
+                      }}
+                    >Ver detalles →</button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* BANNER CTA */}
+        {/* BANNER INFERIOR LLAMADO A LA ACCIÓN */}
         <div style={{
           background: 'linear-gradient(135deg, #0d0f12 0%, #16181D 100%)',
           padding: '56px 20px',
@@ -276,13 +266,13 @@ export default function Catalogo() {
 
       </main>
 
-      {/* MODAL DETALLE */}
+      {/* MODAL DETALLE FLOTANTE */}
       {modalServicio && (
         <div
           onClick={() => setModalServicio(null)}
           style={{
             position: 'fixed', inset: 0,
-            backgroundColor: 'rgba(22,24,29,0.85)', // 🔥 Fondo oscuro para el modal
+            backgroundColor: 'rgba(22,24,29,0.85)', 
             display: 'flex', justifyContent: 'center', alignItems: 'center',
             zIndex: 1050, padding: '20px',
             backdropFilter: 'blur(5px)',
@@ -295,7 +285,7 @@ export default function Catalogo() {
           >
             {/* Imagen modal */}
             <div style={{ position: 'relative', height: '230px', flexShrink: 0 }}>
-              <img src={modalServicio.imagen} alt={modalServicio.nombre}
+              <img src={modalServicio.imagen || 'https://via.placeholder.com/800x600'} alt={modalServicio.nombre}
                 style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '20px 20px 0 0' }} />
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(22,24,29,0.7) 0%, transparent 60%)', borderRadius: '20px 20px 0 0' }} />
               <button
@@ -311,7 +301,7 @@ export default function Catalogo() {
               {modalServicio.badge && (
                 <span style={{
                   position: 'absolute', top: '14px', left: '14px',
-                  backgroundColor: modalServicio.badgeColor,
+                  backgroundColor: modalServicio.badgeColor || '#D4AF37',
                   color: modalServicio.badgeColor === '#D4AF37' ? '#16181D' : '#D4AF37',
                   fontSize: '0.72rem', fontWeight: '700',
                   padding: '4px 13px', borderRadius: '20px', fontFamily: 'sans-serif',
@@ -337,19 +327,22 @@ export default function Catalogo() {
 
               <p className="text-muted mb-4" style={{ lineHeight: 1.7, fontSize: '0.95rem' }}>{modalServicio.descripcion}</p>
 
-              <div style={{ backgroundColor: '#F3E7E4', borderRadius: '12px', padding: '18px', marginBottom: '24px', border: '1px solid rgba(212, 175, 55, 0.3)' }}>
-                <h6 className="fw-bold mb-3" style={{ color: '#16181D', fontSize: '0.85rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                  ✦ Qué incluye
-                </h6>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                  {modalServicio.detalles.map((det, i) => (
-                    <div key={i} className="d-flex align-items-center gap-2 small" style={{ color: '#4b5563' }}>
-                      <span style={{ color: '#D4AF37', flexShrink: 0, fontWeight: '700', fontSize: '1.1rem' }}>✓</span>
-                      {det}
-                    </div>
-                  ))}
+              {/* RENDERIZADO DINÁMICO DE DETALLES */}
+              {modalServicio.detalles && modalServicio.detalles.length > 0 && (
+                <div style={{ backgroundColor: '#F3E7E4', borderRadius: '12px', padding: '18px', marginBottom: '24px', border: '1px solid rgba(212, 175, 55, 0.3)' }}>
+                  <h6 className="fw-bold mb-3" style={{ color: '#16181D', fontSize: '0.85rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                    ✦ Qué incluye
+                  </h6>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    {modalServicio.detalles.map((det, i) => (
+                      <div key={i} className="d-flex align-items-center gap-2 small" style={{ color: '#4b5563' }}>
+                        <span style={{ color: '#D4AF37', flexShrink: 0, fontWeight: '700', fontSize: '1.1rem' }}>✓</span>
+                        {det}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="d-flex gap-2">
                 <NavLink to="/agendaCitas" className="btn fw-bold flex-fill"
